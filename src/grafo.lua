@@ -60,7 +60,7 @@ local function novo()
         end
         for k, v in pairs(self.vertices) do
             for l, w in pairs(v) do
-                w.aresta_draw = true
+                w.draw_aresta = true
             end
         end
     end

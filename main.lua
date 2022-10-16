@@ -7,7 +7,7 @@ function love.load(arg, unfilteredArg)
     update = true
     ticks = 0
     math.randomseed(os.clock())
-    c, l = 64, 32
+    c, l = 72, 40
     mapa = grafo.novo()
     for i = 1, l do
         for j = 1, c do
@@ -25,14 +25,9 @@ function love.load(arg, unfilteredArg)
     mapa.vertices[19][15]:aresta(mapa.vertices[13][49], 1)
     mapa.vertices[13][49]:aresta(mapa.vertices[19][15], 1)
     mapa:aresta()
-    -- caminho = astar.pathfinder(14, 28, 11, 4, mapa)
-    caminho = astar.pathfinder(math.random(1, l), math.random(1, c), math.random(1, l), math.random(1, c), mapa)
-    mapa.vertices[11][7].cor_vertice = { love.math.colorFromBytes(255, 255, 0) }
-    mapa.vertices[5][9].cor_vertice = { love.math.colorFromBytes(255, 255, 0) }
-    mapa.vertices[4][1].cor_vertice = { love.math.colorFromBytes(255, 255, 0) }
-    mapa.vertices[9][15].cor_vertice = { love.math.colorFromBytes(255, 255, 0) }
-    mapa.vertices[19][15].cor_vertice = { love.math.colorFromBytes(255, 255, 0) }
-    mapa.vertices[13][49].cor_vertice = { love.math.colorFromBytes(255, 255, 0) }
+    caminho = astar.novo(math.random(1, l), math.random(1, c), math.random(1, l), math.random(1, c), mapa)
+    -- while caminho:pathfinder() == nil and true do
+    -- end
 end
 
 function love.update(dt)
@@ -42,21 +37,29 @@ function love.update(dt)
 
     tick = dt
     ticks = ticks + tick
+    caminho:pathfinder()
+    caminho:mapear()
+    mapa.vertices[11][7].cor_vertice = { love.math.colorFromBytes(255, 0, 255) }
+    mapa.vertices[5][9].cor_vertice = { love.math.colorFromBytes(255, 0, 255) }
+    mapa.vertices[4][1].cor_vertice = { love.math.colorFromBytes(255, 0, 255) }
+    mapa.vertices[9][15].cor_vertice = { love.math.colorFromBytes(255, 0, 255) }
+    mapa.vertices[19][15].cor_vertice = { love.math.colorFromBytes(255, 0, 255) }
+    mapa.vertices[13][49].cor_vertice = { love.math.colorFromBytes(255, 0, 255) }
 end
 
 function love.draw()
-    love.graphics.setColor({ love.math.colorFromBytes(255, 255, 255) })
-    love.graphics.print(tick, 4, 4)
-    love.graphics.print(ticks, 4, 4 + 16)
-    love.graphics.print(1 / tick, 4, 4 + 16 * 2)
     if not ARESTA then
         for k, v in pairs(mapa.vertices) do
             for l, w in pairs(v) do
-                w.aresta_draw = false
+                w.draw_aresta = false
             end
         end
     end
     mapa:draw()
+    love.graphics.setColor({ love.math.colorFromBytes(255, 255, 255) })
+    love.graphics.print(tick, 4, 4)
+    love.graphics.print(ticks, 4, 4 + 16)
+    love.graphics.print(1 / tick, 4, 4 + 16 * 2)
 end
 
 function love.keypressed(key, scancode, isrepeat)

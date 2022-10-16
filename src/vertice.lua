@@ -7,8 +7,8 @@
 ]]
 
 H = 16 -- Tamanho
-L = 18 -- Espaçamento
-C = 32 -- Deslocamento
+L = 17 -- Espaçamento
+C = 0 -- Deslocamento
 
 --[[
     Construtor os parâmetros i e j são identificação única do vértice em 2D.
@@ -21,7 +21,7 @@ local function novo(i, j)
         arestas = {}, -- Conjunto de vértice conectados.
         -- Adicional para visualização gráfica, opcional.
         draw_aresta = false, -- Para não repetir o desenho da aresta. true, desenhar.
-        cor_vertice = { love.math.colorFromBytes(255, 255, 255) },
+        cor_vertice = { love.math.colorFromBytes(139, 69, 19) },
         cor_aresta = { love.math.colorFromBytes(127, 127, 127) }
     }
 
