@@ -4,6 +4,7 @@
 
     Fazer:
     Add aresta vértice e g, aresta é uma classe?
+    apontar para o vértice pai, pode ser uma lista de vértices pais?
 ]]
 
 H = 16 -- Tamanho
@@ -21,19 +22,19 @@ local function novo(i, j)
         arestas = {}, -- Conjunto de vértice conectados.
         -- Adicional para visualização gráfica, opcional.
         draw_aresta = false, -- Para não repetir o desenho da aresta. true, desenhar.
-        cor_vertice = { love.math.colorFromBytes(139, 69, 19) },
-        cor_aresta = { love.math.colorFromBytes(127, 127, 127) }
+        cor_vertice = { love.math.colorFromBytes(63, 130, 0) },
+        cor_aresta = { love.math.colorFromBytes(255, 255, 255, 127) }
     }
 
     -- Cria aresta para este vértice e custo g.
     function classe:aresta(vertice, g)
-        if vertice then
+        if vertice and vertice.i then
             if not self.arestas[vertice.i] then
                 self.arestas[vertice.i] = {}
             end
             self.arestas[vertice.i][vertice.j] = { vertice = vertice, g = g }
         end
-    end
+    end -- Cada aresta com sua propriedade cor_aresta
 
     -- Adicional para visualização gráfica, opcional.
     function classe:draw() -- Desenha o vértice.

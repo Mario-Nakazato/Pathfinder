@@ -3,29 +3,28 @@ require "/src/grafo"
 require "/src/astar"
 
 function love.load(arg, unfilteredArg)
-    ARESTA = false
     update = true
     ticks = 0
-    math.randomseed(os.clock())
+    love.math.setRandomSeed(love.timer.getTime() * 10 ^ 7)
+    resolveu = 0
+    TIMER = false
+    -- c, l = 110, 62
     c, l = 72, 40
+    o_i, o_j, d_i, d_j = love.math.random(1, l), love.math.random(1, c), love.math.random(1, l), love.math.random(1, c)
     mapa = grafo.novo()
     for i = 1, l do
         for j = 1, c do
-            if j ~= 8 and i ~= 7 then
-                mapa:vertice(i, j)
+            mapa:vertice(i, j)
+            if love.math.random() <= 0.56 then
+                if (o_i ~= i or o_j ~= j) and (d_i ~= i or d_j ~= j) then
+                    mapa:excluir_vertice(i, j)
+                end
             end
         end
     end
-    mapa.vertices[11][7]:aresta(mapa.vertices[5][9], 1)
-    mapa.vertices[5][9]:aresta(mapa.vertices[11][7], 1)
-    mapa.vertices[11][7]:aresta(mapa.vertices[4][1], 1)
-    mapa.vertices[4][1]:aresta(mapa.vertices[11][7], 1)
-    mapa.vertices[4][1]:aresta(mapa.vertices[9][15], 1)
-    mapa.vertices[9][15]:aresta(mapa.vertices[4][1], 1)
-    mapa.vertices[19][15]:aresta(mapa.vertices[13][49], 1)
-    mapa.vertices[13][49]:aresta(mapa.vertices[19][15], 1)
     mapa:aresta()
-    caminho = astar.novo(math.random(1, l), math.random(1, c), math.random(1, l), math.random(1, c), mapa)
+    caminho = astar.novo(mapa.vertices[o_i][o_j], mapa.vertices[d_i][d_j], mapa)
+    caminho:iniciar()
     -- while caminho:pathfinder() == nil and true do
     -- end
 end
@@ -37,24 +36,53 @@ function love.update(dt)
 
     tick = dt
     ticks = ticks + tick
-    caminho:pathfinder()
-    caminho:mapear()
-    mapa.vertices[11][7].cor_vertice = { love.math.colorFromBytes(255, 0, 255) }
-    mapa.vertices[5][9].cor_vertice = { love.math.colorFromBytes(255, 0, 255) }
-    mapa.vertices[4][1].cor_vertice = { love.math.colorFromBytes(255, 0, 255) }
-    mapa.vertices[9][15].cor_vertice = { love.math.colorFromBytes(255, 0, 255) }
-    mapa.vertices[19][15].cor_vertice = { love.math.colorFromBytes(255, 0, 255) }
-    mapa.vertices[13][49].cor_vertice = { love.math.colorFromBytes(255, 0, 255) }
+
+    b_caminho = caminho:pathfinder()
+    if b_caminho ~= nil and not TIMER then
+        resolveu = resolveu + 1
+        print(b_caminho, "pathfinder", resolveu)
+        repeat
+            o_i, o_j = love.math.random(1, l), love.math.random(1, c)
+            if mapa.vertices[o_i] then
+                orig = mapa.vertices[o_i][o_j]
+            end
+        until orig
+        repeat
+            d_i, d_j = love.math.random(1, l), love.math.random(1, c)
+            if mapa.vertices[d_i] then
+                dest = mapa.vertices[d_i][d_j]
+            end
+        until dest
+        TIMER = true
+        ticks = 0
+    end
+    if TIMER and ticks > 2 then
+        TIMER           = false
+        caminho.origem  = orig
+        caminho.destino = dest
+        caminho:iniciar()
+    end
+    if love.math.random() <= 0.01 and false then
+        for i = 1, love.math.random(c * l) do
+            repeat
+                x_i, x_j = love.math.random(1, l), love.math.random(1, c)
+                if mapa.vertices[x_i] then
+                    vX = mapa.vertices[x_i][x_j]
+                end
+            until (o_i ~= x_i or o_j ~= x_j) and (d_i ~= x_i or d_j ~= x_j)
+            if love.math.random() <= 0.01 then
+                if vX then
+                    mapa:excluir_vertice(x_i, x_j)
+                else
+                    mapa:vertice(x_i, x_j)
+                end
+            end
+        end
+        mapa:aresta()
+    end
 end
 
 function love.draw()
-    if not ARESTA then
-        for k, v in pairs(mapa.vertices) do
-            for l, w in pairs(v) do
-                w.draw_aresta = false
-            end
-        end
-    end
     mapa:draw()
     love.graphics.setColor({ love.math.colorFromBytes(255, 255, 255) })
     love.graphics.print(tick, 4, 4)
@@ -63,11 +91,29 @@ function love.draw()
 end
 
 function love.keypressed(key, scancode, isrepeat)
-    if key == "f5" then
+    if key == "f1" then
+        update = not update
+    end
+    if key == 'f5' then
         love.load(arg, unfilteredArg)
     end
-    if key == "a" then
-        ARESTA = not ARESTA
+    if key == 'f2' then
+        repeat
+            o_i, o_j = love.math.random(1, l), love.math.random(1, c)
+            if mapa.vertices[o_i] then
+                orig = mapa.vertices[o_i][o_j]
+            end
+        until orig
+        repeat
+            d_i, d_j = love.math.random(1, l), love.math.random(1, c)
+            if mapa.vertices[d_i] then
+                dest = mapa.vertices[d_i][d_j]
+            end
+        until dest
+        update = true
+        caminho.origem = orig
+        caminho.destino = dest
+        caminho:iniciar()
     end
 end
 
